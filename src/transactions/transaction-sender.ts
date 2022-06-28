@@ -67,7 +67,7 @@ export class TransactionSender implements ITransactionSender {
             if (typeGuard(this.unlockedAccount, UnlockedAccount)) {
                 txSignatureOrError = await this.signWithUnlockedAccount(bytesToSign, this.unlockedAccount as UnlockedAccount)
             } else if (this.txSigner !== undefined) {
-                txSignatureOrError = this.signWithTrasactionSigner(bytesToSign, this.txSigner as TransactionSigner)
+                txSignatureOrError = await this.signWithTrasactionSigner(bytesToSign, this.txSigner as TransactionSigner)
             } else {
                 return new RpcError("0", "No account or TransactionSigner specified")
             }
@@ -304,8 +304,8 @@ export class TransactionSender implements ITransactionSender {
      * @returns {TxSignature | Error} - A transaction signature or error.
      * @memberof TransactionSender
      */
-    private signWithTrasactionSigner(bytesToSign: Buffer, txSigner: TransactionSigner): TxSignature | Error {
-        const transactionSignatureOrError = txSigner(bytesToSign)
+    private async signWithTrasactionSigner(bytesToSign: Buffer, txSigner: TransactionSigner): Promise<TxSignature | Error> {
+        const transactionSignatureOrError = await txSigner(bytesToSign)
         if (typeGuard(transactionSignatureOrError, Error)) {
             return transactionSignatureOrError as Error
         }
